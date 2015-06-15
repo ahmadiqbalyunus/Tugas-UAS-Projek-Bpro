@@ -1,0 +1,312 @@
+import java.io.*;
+import java.util.*;
+public class UASProjek{
+  
+  public static String [][] produk = { {"001","pensil","100","20000","30000"},
+                                       {"002","penggaris","150","5000","10000"},
+                                       {"003","tongkat","70","7000","15000"},
+                                       {"004","sabuk","40","60000","70000"},
+                                       {"005","buku","38","50000","55000"},
+                                       {"006","sampul","25","25000","30000"},
+                                       {"007","tali","20","5000","15000"},
+                                       {"008","kresek","10","500","1000"},
+                                       {"009","stipo","39","6000","9000"},
+                                       {"010","penghapus","27","700","1000"},
+                                       {"011","triplek","40","30000","35000"},
+                                       {"012","dasi","5","4000","5000"},
+                                     };
+                                      
+  
+  // 
+  public static Vector <Vector> transaksi = new Vector<Vector>();
+  
+  public static Vector<Object> addt(String kdt,String tgl, String kdb, String nmb, int hgb, int jml, int toth){
+    Vector<Object> vtr = new Vector<Object>();
+    vtr.addElement(kdt);
+    vtr.addElement(tgl);
+    vtr.addElement(kdb);
+    vtr.addElement(nmb);
+    vtr.addElement(hgb);
+    vtr.addElement(jml);
+    vtr.addElement(toth);
+    return vtr;
+  }
+  
+  //
+  public static int i=0,omset=0;
+  
+  public static String kodePenjualan (){
+    String kdj = "BR";
+    i = i + 1;
+    kdj = kdj + i;
+    return kdj;
+  }
+  
+  // data penjualan
+  public static void cetakjual(){
+    System.out.println("Kdtr\tTanggal\t\t\tKdbr\tNmBrng\tHarga\tJumlah\tTotal");
+    System.out.println("-------------------------------------------------------------------------------------------------");
+    for(int k=0;k<transaksi.size();k++){
+      System.out.println(transaksi.elementAt(k).elementAt(0)+"\t"+transaksi.elementAt(k).elementAt(1)+"\t"+transaksi.elementAt(k).elementAt(2)+"\t"+
+    transaksi.elementAt(k).elementAt(3)+"\t"+transaksi.elementAt(k).elementAt(4)+"\t"+transaksi.elementAt(k).elementAt(5)+"\t"+
+                         transaksi.elementAt(k).elementAt(6));
+    }
+ 
+  }
+  
+  //mencari data barang
+  public static int cariData(String [][] data, String kode){ 
+    int indeks = -1;
+    int a=0;
+    do{
+      if(produk[a][0].equalsIgnoreCase(kode)){
+        indeks = a;
+      }
+      a++;
+    }
+    while(a<data.length && indeks == -1);
+    return indeks;
+  }
+  
+  // loogin
+  public static String [][] data = {{"root","root"}};
+  
+  public static boolean login(){
+    Scanner sc= new Scanner(System.in);
+    int y=1;
+    boolean login = false;
+    do{
+      
+      System.out.print("Username : ");
+      String user = sc.next();
+      System.out.print("Password : ");
+      String pass = sc.next();
+      for(int x=0;x<data.length;x++){
+        if(user.equals(data[x][0]) && pass.equals(data[x][1])){
+          login = true;
+          y=3;
+        }
+      }
+      y++;
+    }while(y<=3 && login == false);
+    return login;
+  }
+  
+  
+  public static void main(String[]args)throws IOException{
+    
+    Scanner sc = new Scanner (System.in);
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    
+    boolean exit = false;
+    String input;
+    int idx;
+    
+    boolean login = login();
+    if(login == false){
+    }
+    else{
+    do{
+      System.out.println();
+      System.out.println("----------------------------");
+      System.out.println("1. Transaksi                ");
+      System.out.println("2. Ubah Data                ");
+      System.out.println("3. Delete Data              ");
+      System.out.println("4. Tambah Data              ");
+      System.out.println("5. Data Penjualan           ");
+      System.out.println("6. Data Barang              ");
+      System.out.println("7. Cari Data Barang         ");
+      System.out.println("8. Omset                    ");
+      System.out.println("9. Keluar                   ");
+      System.out.println("----------------------------");
+      System.out.println();    
+      System.out.println("Masukan pilihan 1-7 : ");
+      int pil = Integer.parseInt(br.readLine());
+      switch(pil){
+        case 1 :
+          boolean beli = true;
+          int total = 0;
+          do{
+            System.out.print("Masukan Kode barang : ");
+            String kode = br.readLine();
+            idx = cariData(produk,kode);
+            if(idx == -1){
+              System.out.println("Data tidak ada");
+            }
+            else{
+              Date tanggal = new Date();
+              String tgl = tanggal.toString();
+              String kdtr = kodePenjualan();
+              System.out.print("Jumlah : ");
+              int jml = Integer.parseInt(br.readLine());
+              System.out.println("Kode barang : " + produk[idx][0]);
+              System.out.println("Nama barang : " + produk[idx][1]);
+              System.out.println("Total harga : " + Integer.parseInt(produk[idx][2])*jml); //convert produk [][]to Integer
+              total = total + Integer.parseInt(produk[idx][2])*jml;
+              System.out.println("TOTAL TRANSAKSI : " + total);
+              omset = omset + total;// hasil dari inputan dari transaksi
+              transaksi.addElement(addt(kdtr,tgl,produk[idx][0],produk[idx][1],Integer.parseInt(produk[idx][2]),jml,Integer.parseInt(produk[idx][2])*jml));
+              System.out.print("Beli lagi[y/n]? ");
+              String bl = br.readLine();
+              if(bl.equalsIgnoreCase("n")){
+                beli = false;
+              }
+              else{
+                beli = true;
+              }
+            }
+          }while(beli == true);
+          break;
+        case 2 ://mengubah data
+          String arr1 [][] = new String [produk.length][4];
+          boolean out = false;
+          System.arraycopy(produk,0,arr1,0,produk.length);
+          
+          do{
+          System.out.print("Kode Barang  : ");
+          String kdbr = sc.next();
+          idx =-1 ;
+          
+          for (int i=0; i<produk.length;i++)
+          {
+             if (produk[i][0].equalsIgnoreCase(kdbr))
+            {
+              idx=0;                                           
+              System.out.println ("Kode Barang\t\t Nama Barang\t \t\tHarga Barang\t\t Harga Beli");
+              System.out.println (produk[i][0]+"\t\t"+produk[i][1]+"\t\t Rp."+produk[i][2] +"\t\t Rp."+produk[i][3]);
+               
+              System.out.print ("Ingin Mengubah Kode ? [n/y]:");
+              String cr = sc.next();
+              
+              if (cr.equalsIgnoreCase("y"))
+              {
+                System.out.print ("kode barang : ");
+                kdbr =sc.next();
+                int dex = -1;
+                for(int s=0;s<arr1.length;s++){
+                  if(kdbr.equalsIgnoreCase(arr1[s][0])){
+                    
+                    dex=0;
+                    System.out.println  ("----------------------------------------");
+                    System.out.println  ("        Kode Barang Sudah Ada           ");
+                    System.out.println  ("----------------------------------------");
+                    System.out.println  ("          Silahkan coba kembali         ");
+                    System.out.println  ("----------------------------------------");
+                    out = false;
+                   
+                  }
+                } 
+                
+                 if (dex==-1)
+                {
+                  kdbr=arr1[i][0];
+               
+                  System.out.print ("masukan nama barang :");
+                  arr1[i][1]=br.readLine();
+                  System.out.print ("masukan harga beli : ");
+                  arr1[i][2]=sc.next();
+                  System.out.print ("masukan harga jual");
+                  arr1[i][3]=sc.next();  
+                  out=true;
+                }
+              }
+               else {
+                out=true;
+                idx=0;
+              }
+             }
+           }
+             if (idx==-1)
+            {
+              System.out.println ("MAAF DATA YANG ANDA UPDATE TIDAK TERSEDIA");
+            }
+          }while (out==false);
+      
+          break;
+         
+          case 3 ://delete data
+           String pilih;
+           int indek;
+           String [][]db1 = new String [produk.length-1][4];
+           System.out.print ("masukan kode barang  :");
+           String hapus=sc.next();
+           indek=-1;
+            for (int i=0; i<produk.length;i++)
+           {
+             if (produk[i][0].equalsIgnoreCase(hapus))
+             {
+               indek=0;                     
+               System.out.println ("Kode Barang\t\t Nama Barang\t \t\tHarga Barang\t\t Harga Beli");
+               System.out.println (produk[i][0]+"\t\t"+produk[i][1]+"\t\t Rp."+produk[i][2] +"\t\t Rp."+produk[i][3]+"\t"+produk[i][4]);
+               System.out.print("anda ingin menghapus barang ? iya [y]/tidak[t]");
+               pilih = sc.next();
+            
+             if (pilih.equalsIgnoreCase("y"))
+             {
+              String newdb1[][]=new String[db1.length][4];  
+              System.arraycopy(produk,0,newdb1,0,i);
+              System.arraycopy(produk,(i+1),newdb1,i,(produk.length-i)-1);
+              produk=new String[newdb1.length][4];
+              System.arraycopy(newdb1,0,produk,0,newdb1.length);
+              System.out.print("hapus data berhasil");
+             }
+             }
+            }
+          break;
+          
+          case 4 :
+             System.out.print("masukan kode barang  :");
+             String kdbr =sc.next();
+             System.out.print ("masukan nama barang  :");
+             String nmbr = sc.next();
+             System.out.print ("masukan harga beli  :");
+             String mdbr =sc.next();
+             System.out.print ("masukan harga jual barang  :");
+             String hrbr =sc.next();
+             String [][]newarr1 = new String [produk.length][4];
+             System.arraycopy (produk,0,newarr1,0,produk.length);
+             
+             arr1 = new String [produk.length+1][4];
+             System.arraycopy (newarr1,0,produk,0,newarr1.length);
+                                         produk[produk.length-1][0]=kdbr; 
+                                         produk[produk.length-1][1]=nmbr; 
+                                         produk[produk.length-1][2]=mdbr; 
+                                         produk[produk.length-1][3]=hrbr;
+          break;
+         
+        case 5 :
+              cetakjual();
+          break;
+        case 6 :
+          for(int i=0;i<produk.length;i++){
+          System.out.println(produk[i][0] +"\t"+ produk[i][1] +"\t"+ produk[i][2]);
+        }
+          break;
+        case 7 :
+          System.out.print("Inputkan data barang : ");
+          input = br.readLine();
+          idx = cariData(produk,input);
+          if(idx == -1){
+            System.out.println("Data tidak ada");
+          }
+          else{
+            System.out.println("Kode barang : " + produk[idx][0]);
+            System.out.println("Nama barang : " + produk[idx][1]);
+            System.out.println("Harga barang : " + produk[idx][2]);     
+          }
+          break;
+        case 8 :
+          System.out.println("OMSET PENJUALAN SAAT INI : " + omset);
+          break;
+        case 9 :
+          exit = true;
+          break;
+      }
+      
+    }while(exit == false);
+    }
+    
+    
+  }
+  
+}
